@@ -16,7 +16,6 @@ def httpGetRequest(url):
         # raise_for_status will throw an exception if an HTTP error
         result.raise_for_status
         print(result)
-        # call web scraping function and return result from request
         return result
     except HTTPError as err:
         print("Error: {0}".format(err))
