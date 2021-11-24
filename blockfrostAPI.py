@@ -25,18 +25,18 @@ def getStakeAddr():
     return data['stake_address']
 
 
-def getAddrAmt(stakeAddress):
+def getAddrAmt(stakeAddr):
     call_type = 'accounts' 
     payload = {
         } # example=> {'order' : 'desc'}
 
-    url = f'{URL_BASE}/{VERSION}/{call_type}/{stakeAddress}'
-    data = httpGetRequest(url, payload, viewResults=True)
+    url = f'{URL_BASE}/{VERSION}/{call_type}/{stakeAddr}'
+    data = httpGetRequest(url, payload, viewResults=False)
 
     return (int(data['controlled_amount']) // 1000000) # amount coverted to ada
 
 
-def getTransactionVolume():
+def getTransactionVol():
     call_type1 = 'epochs' 
     call_type2 = 'next'
     epochNumber = 0
@@ -63,7 +63,7 @@ def main():
     # addr_amt = getAddrAmt(stakeAddr)
     # print("ADA available:", addr_amt) 
 
-    epochTxCount = getTransactionVolume()
+    epochTxCount = getTransactionVol()
     print(epochTxCount)
 
 
