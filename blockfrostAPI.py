@@ -1,19 +1,20 @@
 import requests
 from requests.exceptions import HTTPError, Timeout
 import json
+import time
 
 from config import HEADER, VERSION, URL_BASE, ADDRESS
 
+def main():
+    # stakeAddr = getStakeAddr()
+    # addr_amt = getAddrAmt(stakeAddr)
+    # print("ADA available:", addr_amt) 
 
-def httpGetRequest(urlStr, payload={}, viewResults=False):
-    result = requests.get(url=urlStr , headers=HEADER, params=payload)
-    print("Status: {0}".format(result))
-    # print(result.url)
-    result_jsonStr = json.loads(result.text) # could be wrapped in a list depending on the api call
-    if viewResults == True:
-        print(json.dumps(result_jsonStr, indent=4)) # view results in a pretty format
-    return result_jsonStr
+    # epochTxCount = getTransactionVol()
+    # print(epochTxCount)
 
+    StaKePoolList = getStakePoolList()
+    print(StaKePoolList)
 
 def getStakeAddr():
     call_type = 'addresses' 
@@ -27,13 +28,29 @@ def getStakeAddr():
 
 def getAddrAmt(stakeAddr):
     call_type = 'accounts' 
+    url = f'{URL_BASE}/{VERSION}/{call_type}/{stakeAddr}'
     payload = {
         } # example=> {'order' : 'desc'}
-
-    url = f'{URL_BASE}/{VERSION}/{call_type}/{stakeAddr}'
     data = httpGetRequest(url, payload, viewResults=False)
-
     return (int(data['controlled_amount']) // 1000000) # amount coverted to ada
+
+
+def getStakePoolList():
+    call_type = 'pools' 
+    url = f'{URL_BASE}/{VERSION}/{call_type}'
+    poolList, emptyData = [], False
+    i = 0
+    while not emptyData:
+        payload = {
+            'count' : '100',
+            'page' : str(i+1)
+            } # Default: {'order' : 'asc'}
+        data = httpGetRequest(url, payload, viewResults=False)
+        poolList += data
+        i += 1 
+        if not data: 
+            emptyData = True
+    return poolList
 
 
 def getTransactionVol():
@@ -41,8 +58,7 @@ def getTransactionVol():
     call_type2 = 'next'
     epochNumber = 0
     url = f'{URL_BASE}/{VERSION}/{call_type1}/{epochNumber}/{call_type2}'
-
-    totalData = []
+    totalTxVol = []
     pageNum = 4
     for i in range(pageNum):
         payload = {
@@ -50,21 +66,30 @@ def getTransactionVol():
             'page' : str(i+1)
             }
         data = httpGetRequest(url, payload, viewResults=False)
-        totalData += data
+        totalTxVol += data
 
     epochTxCount = dict()
-    for i in range(len(totalData)): 
-        epochTxCount.update({totalData[i]['epoch'] : totalData[i]['tx_count']})
+    for i in range(len(totalTxVol)): 
+        epochTxCount.update({ totalTxVol[i]['epoch'] : [totalTxVol[i]['tx_count'], posixToDate(totalTxVol[i]['start_time'])] })
     return epochTxCount    
 
 
-def main():
-    # stakeAddr = getStakeAddr()
-    # addr_amt = getAddrAmt(stakeAddr)
-    # print("ADA available:", addr_amt) 
+def httpGetRequest(urlStr, payload={}, viewResults=False):
+    result = requests.get(url=urlStr , headers=HEADER, params=payload)
+    print("Status: {0}".format(result))
+    # print(result.url)
+    result_jsonStr = json.loads(result.text) # could be wrapped in a list depending on the api call
+    if viewResults == True:
+        print(json.dumps(result_jsonStr, indent=4)) # view results in a pretty format
+    return result_jsonStr
 
-    epochTxCount = getTransactionVol()
-    print(epochTxCount)
+
+def posixToDate(POSIXTime):
+    date = time.strftime('%Y-%m-%d', time.localtime(POSIXTime)) # For exact time include> %H:%M:%S
+    # from datetime import datetime
+    # datetime.strptime("2012-may-31 19:00", "%Y-%b-%d %H:%M")
+    # datetime.datetime(2012, 5, 31, 19, 0)
+    return date
 
 
 if __name__ == '__main__':
