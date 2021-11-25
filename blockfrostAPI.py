@@ -10,11 +10,11 @@ def main():
     # addr_amt = getAddrAmt(stakeAddr)
     # print("ADA available:", addr_amt) 
 
-    # epochTxCount = getTransactionVol()
-    # print(epochTxCount)
+    epochTxCount = getTransactionVol()
+    print(epochTxCount)
 
-    StaKePoolList = getStakePoolList()
-    print(StaKePoolList)
+    # StaKePoolList = getStakePoolList()
+    # print(StaKePoolList)
 
 def getStakeAddr():
     call_type = 'addresses' 
@@ -38,8 +38,8 @@ def getAddrAmt(stakeAddr):
 def getStakePoolList():
     call_type = 'pools' 
     url = f'{URL_BASE}/{VERSION}/{call_type}'
-    poolList, emptyData = [], False
-    i = 0
+    poolList = []
+    emptyData, i = False, 0
     while not emptyData:
         payload = {
             'count' : '100',
@@ -59,14 +59,17 @@ def getTransactionVol():
     epochNumber = 0
     url = f'{URL_BASE}/{VERSION}/{call_type1}/{epochNumber}/{call_type2}'
     totalTxVol = []
-    pageNum = 4
-    for i in range(pageNum):
+    emptyData, i = False, 0
+    while not emptyData:
         payload = {
             'count' : '100',
             'page' : str(i+1)
             }
         data = httpGetRequest(url, payload, viewResults=False)
         totalTxVol += data
+        i += 1
+        if not data: 
+            emptyData = True
 
     epochTxCount = dict()
     for i in range(len(totalTxVol)): 
