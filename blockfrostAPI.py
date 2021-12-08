@@ -20,7 +20,6 @@ def getStakeAddr():
     call_type = 'addresses' 
     payload = {
         } # pass parameters as a dictionary; example=> {'order' : 'desc'}
-
     url = f'{URL_BASE}/{VERSION}/{call_type}/{ADDRESS}'
     data = httpGetRequest(url, payload, viewResults=False)
     return data['stake_address']
@@ -70,7 +69,6 @@ def getTransactionVol():
         i += 1
         if not data: 
             emptyData = True
-
     epochTxCount = dict()
     for i in range(len(totalTxVol)): 
         epochTxCount.update({ totalTxVol[i]['epoch'] : [totalTxVol[i]['tx_count'], posixToDate(totalTxVol[i]['start_time'])] })
