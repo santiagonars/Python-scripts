@@ -1,10 +1,10 @@
 import os
-import requests
-from requests.exceptions import HTTPError, Timeout
 import json
 import time
+import requests
+from requests.exceptions import HTTPError, Timeout
 
-from config import HEADER, VERSION, URL_BASE, ADDRESS
+from config import HEADER, VERSION, URL_BASE, ADDRESS # config contains api key
 from matplotlib.ticker import FormatStrFormatter, StrMethodFormatter
 import matplotlib.pyplot as plt
 import numpy as np
