@@ -17,7 +17,7 @@ def main():
     # StaKePoolList = getStakePoolList()
     # print(StaKePoolList)
 
-    epochTxCount = getTransactionVol(createChart=True)
+    epochTxCount = getTransactionCount(createChart=True)
     for key, value in epochTxCount.items():
         print(key, ':', value)
 
@@ -58,7 +58,7 @@ def getStakePoolList():
     return poolList
 
 
-def getTransactionVol(createChart=False):
+def getTransactionCount(createChart=False):
     call_type1 = 'epochs' 
     call_type2 = 'next'
     epochNumber = 0
@@ -81,12 +81,12 @@ def getTransactionVol(createChart=False):
         # epochTxCount.update({ totalTxVol[i]['epoch'] : [totalTxVol[i]['tx_count'], posixToDate(totalTxVol[i]['start_time'])] })
     
     if createChart == True:
-        chart_TxVol(epochTxCount)
+        chart_TxCount(epochTxCount)
         
     return epochTxCount # returns dict
 
 
-def chart_TxVol(epochTxCount):
+def chart_TxCount(epochTxCount):
     x = np.array(list(epochTxCount.keys())) # epochs
     y = np.array(list(epochTxCount.values())) # transaction count
     
@@ -108,7 +108,7 @@ def chart_TxVol(epochTxCount):
     plt.grid(axis = 'x', linestyle = 'dashed')
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    plt.savefig(dir_path + '/charts/CardanoTxVol.png')
+    plt.savefig(dir_path + '/charts/CardanoTxCount.png')
     # plt.show()
 
 
