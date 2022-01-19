@@ -63,7 +63,7 @@ def getTransactionCount(createChart=False):
     call_type2 = 'next'
     epochNumber = 0
     url = f'{URL_BASE}/{VERSION}/{call_type1}/{epochNumber}/{call_type2}'
-    totalTxVol = []
+    nextEpochsData = []
     emptyData, i = False, 0
     while not emptyData:
         payload = {
@@ -71,14 +71,14 @@ def getTransactionCount(createChart=False):
             'page' : str(i+1)
             }
         data = httpGetRequest(url, payload, viewResults=False)
-        totalTxVol += data
+        nextEpochsData += data
         i += 1
         if not data: 
             emptyData = True
     epochTxCount = {}
-    for i in range(len(totalTxVol)): 
-        epochTxCount.update({ totalTxVol[i]['epoch'] : totalTxVol[i]['tx_count'] })
-        # epochTxCount.update({ totalTxVol[i]['epoch'] : [totalTxVol[i]['tx_count'], posixToDate(totalTxVol[i]['start_time'])] })
+    for i in range(len(nextEpochsData)): 
+        epochTxCount.update({ nextEpochsData[i]['epoch'] : nextEpochsData[i]['tx_count'] })
+        # epochTxCount.update({ nextEpochsData[i]['epoch'] : [nextEpochsData[i]['tx_count'], posixToDate(nextEpochsData[i]['start_time'])] })
     
     if createChart == True:
         chart_TxCount(epochTxCount)
