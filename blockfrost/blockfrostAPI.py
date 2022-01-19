@@ -1,3 +1,4 @@
+import os
 import requests
 from requests.exceptions import HTTPError, Timeout
 import json
@@ -105,7 +106,9 @@ def chart_TxVol(epochTxCount):
     plt.xlabel("Epoch", fontdict = font2)
     plt.ylabel("Number of Transactions", fontdict = font2)
     plt.grid(axis = 'x', linestyle = 'dashed')
-    plt.savefig('CardanoTxVol.png')
+
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    plt.savefig(dir_path + '/charts/CardanoTxVol.png')
     # plt.show()
 
 
