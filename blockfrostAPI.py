@@ -4,17 +4,22 @@ import json
 import time
 
 from config import HEADER, VERSION, URL_BASE, ADDRESS
+from matplotlib.ticker import FormatStrFormatter, StrMethodFormatter
+import matplotlib.pyplot as plt
+import numpy as np
 
 def main():
     # stakeAddr = getStakeAddr()
     # addr_amt = getAddrAmt(stakeAddr)
-    # print("ADA available:", addr_amt) 
-
-    epochTxCount = getTransactionVol()
-    print(epochTxCount)
+    # print("ADA available:", addr_amt)
 
     # StaKePoolList = getStakePoolList()
     # print(StaKePoolList)
+
+    epochTxCount = getTransactionVol(createChart=True)
+    for key, value in epochTxCount.items():
+        print(key, ':', value)
+
 
 def getStakeAddr():
     call_type = 'addresses' 
@@ -52,7 +57,7 @@ def getStakePoolList():
     return poolList
 
 
-def getTransactionVol():
+def getTransactionVol(createChart=False):
     call_type1 = 'epochs' 
     call_type2 = 'next'
     epochNumber = 0
@@ -69,10 +74,39 @@ def getTransactionVol():
         i += 1
         if not data: 
             emptyData = True
-    epochTxCount = dict()
+    epochTxCount = {}
     for i in range(len(totalTxVol)): 
-        epochTxCount.update({ totalTxVol[i]['epoch'] : [totalTxVol[i]['tx_count'], posixToDate(totalTxVol[i]['start_time'])] })
-    return epochTxCount    
+        epochTxCount.update({ totalTxVol[i]['epoch'] : totalTxVol[i]['tx_count'] })
+        # epochTxCount.update({ totalTxVol[i]['epoch'] : [totalTxVol[i]['tx_count'], posixToDate(totalTxVol[i]['start_time'])] })
+    
+    if createChart == True:
+        chart_TxVol(epochTxCount)
+        
+    return epochTxCount # returns dict
+
+
+def chart_TxVol(epochTxCount):
+    x = np.array(list(epochTxCount.keys())) # epochs
+    y = np.array(list(epochTxCount.values())) # transaction count
+    
+    font1 = {'family':'serif','color':'blue','size':30}
+    font2 = {'family':'serif','color':'darkred','size':25}
+    plt.rcParams["figure.figsize"] = (20,12)
+
+    fig, ax = plt.subplots()
+    plt.plot(x, y)
+    
+    plt.xticks(np.arange(min(x)-1, max(x)+9, 10.0))
+    plt.xticks(fontsize=15, rotation=45)
+    plt.yticks(fontsize=15)
+    ax.yaxis.set_major_formatter(StrMethodFormatter('{x:,}'))
+    
+    plt.title("Cardano Transaction Count", fontdict = font1)
+    plt.xlabel("Epoch", fontdict = font2)
+    plt.ylabel("Number of Transactions", fontdict = font2)
+    plt.grid(axis = 'x', linestyle = 'dashed')
+    plt.savefig('CardanoTxVol.png')
+    # plt.show()
 
 
 def httpGetRequest(urlStr, payload={}, viewResults=False):
@@ -95,4 +129,4 @@ def posixToDate(POSIXTime):
 
 if __name__ == '__main__':
     main()
-    
+
