@@ -17,9 +17,9 @@ def main():
     # StaKePoolList = getStakePoolList()
     # print(StaKePoolList)
 
-    epochTxCount = getTransactionCount(createChart=True)
-    for key, value in epochTxCount.items():
-        print(key, ':', value)
+    epochTxCount = getTransactionCount(createChart=True, chartName='CardanoTxCount.png')
+    # for key, value in epochTxCount.items():
+    #     print(key, ':', value)
 
 
 def getStakeAddr():
@@ -58,7 +58,7 @@ def getStakePoolList():
     return poolList
 
 
-def getTransactionCount(createChart=False):
+def getTransactionCount(createChart=False, chartName=""):
     call_type1 = 'epochs' 
     call_type2 = 'next'
     epochNumber = 0
@@ -81,26 +81,32 @@ def getTransactionCount(createChart=False):
         # epochTxCount.update({ nextEpochsData[i]['epoch'] : [nextEpochsData[i]['tx_count'], posixToDate(nextEpochsData[i]['start_time'])] })
     
     if createChart == True:
-        chart_TxCount(epochTxCount)
+        chart_TxCount(epochTxCount, chartName)
         
     return epochTxCount # returns dict
 
 
-def chart_TxCount(epochTxCount):
+def chart_TxCount(epochTxCount, chartName="chart.png"):
     x = np.array(list(epochTxCount.keys())) # epochs
     y = np.array(list(epochTxCount.values())) # transaction count
     
     font1 = {'family':'serif','color':'blue','size':30}
     font2 = {'family':'serif','color':'darkred','size':25}
     plt.rcParams["figure.figsize"] = (20,12)
-
+    
+    x = x[:-1]
+    y = y[:-1]
+    # x = x[300:-1]
+    # y = y[300:-1]
+    
     fig, ax = plt.subplots()
     plt.plot(x, y)
     
-    plt.xticks(np.arange(min(x)-1, max(x)+9, 10.0))
+    plt.xticks(np.arange(min(x)-1, max(x)+9, 10.0)) # all epochs
+    # plt.xticks(np.arange(min(x)-1, max(x)+1, 1.0)) # zoomed in
     plt.xticks(fontsize=15, rotation=45)
     plt.yticks(fontsize=15)
-    ax.yaxis.set_major_formatter(StrMethodFormatter('{x:,}'))
+    ax.yaxis.set_major_formatter(StrMethodFormatter('{x:,.0f}'))
     
     plt.title("Cardano Transaction Count", fontdict = font1)
     plt.xlabel("Epoch", fontdict = font2)
@@ -108,7 +114,7 @@ def chart_TxCount(epochTxCount):
     plt.grid(axis = 'x', linestyle = 'dashed')
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    plt.savefig(dir_path + '/charts/CardanoTxCount.png')
+    plt.savefig(dir_path + '/charts/' + chartName)
     # plt.show()
 
 
